@@ -1,0 +1,15 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Secrets
+.env
+.env.local
+
+# OS
+.DS_Store
+
+# Data (לא מעלים דאמפים גדולים ל-git)
+*.csv
+!schema.sql
