@@ -1,16 +1,7 @@
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
-
-
-from fastapi import FastAPI
-from supabase import create_client
 import os
 from dotenv import load_dotenv
+from fastapi import FastAPI
+from supabase import create_client
 
 load_dotenv()
 
