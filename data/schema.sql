@@ -1,0 +1,23 @@
+CREATE TABLE funnel_data (
+    id SERIAL PRIMARY KEY,
+    ad_budget INTEGER,
+    num_leads INTEGER,
+    leads_answered INTEGER,
+    leads_not_answered INTEGER,
+    followup_1 INTEGER,
+    followup_2 INTEGER,
+    followup_3 INTEGER,
+    followup_4 INTEGER,
+    followup_5 INTEGER,
+    not_closed INTEGER,
+    closed INTEGER,
+    calls_to_closed INTEGER,
+    calls_to_not_closed INTEGER,
+    customer_acquisition_cost INTEGER,
+    ltv_months NUMERIC,
+    purchased SMALLINT,
+    upsell SMALLINT,
+    cumulative_profit NUMERIC,
+    referred TEXT,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
