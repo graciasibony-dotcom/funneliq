@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FunnelIQ - Login</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 360px;
+    margin: 80px auto;
+    padding: 0 16px;
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin-bottom: 24px;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  input {
+    padding: 10px;
+    font-size: 1rem;
+  }
+  button {
+    padding: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  #message {
+    margin-top: 16px;
+    font-size: 0.95rem;
+  }
+  #message.success { color: green; }
+  #message.error { color: red; }
+</style>
+</head>
+<body>
+
+<h1>FunnelIQ Login</h1>
+
+<form id="login-form">
+  <input type="email" id="email" placeholder="Email" required autocomplete="username">
+  <input type="password" id="password" placeholder="Password" required autocomplete="current-password">
+  <button type="submit">Login</button>
+</form>
+
+<div id="message"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://twescwdxlcnrwitanpfv.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3ZXNjd2R4bGNucndpdGFucGZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyMzk2NjAsImV4cCI6MjEwMDgxNTY2MH0.0a9VFTw9CWUZ2SoWRTneZCFlb-iL9zibA2Kl1fmkwBg";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const form = document.getElementById("login-form");
+  const messageEl = document.getElementById("message");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    messageEl.textContent = "";
+    messageEl.className = "";
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      messageEl.textContent = error.message;
+      messageEl.className = "error";
+      return;
+    }
+
+    localStorage.setItem("funneliq_token", data.session.access_token);
+    messageEl.textContent = "Login successful!";
+    messageEl.className = "success";
+  });
+</script>
+
+</body>
+</html>

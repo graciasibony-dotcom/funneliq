@@ -21,3 +21,16 @@ CREATE TABLE funnel_data (
     referred TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
+
+
+-- Enable Row Level Security on funnel_data
+ALTER TABLE funnel_data ENABLE ROW LEVEL SECURITY;
+
+-- Allow any authenticated (logged-in) user to read all rows
+DROP POLICY IF EXISTS "Authenticated users can read funnel data" ON funnel_data;
+
+CREATE POLICY "Authenticated users can read funnel data"
+ON funnel_data
+FOR SELECT
+TO authenticated
+USING (true);
