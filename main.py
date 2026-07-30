@@ -22,7 +22,9 @@ def get_current_user(authorization: str = Header(None)):
         raise HTTPException(status_code=503, detail="Supabase is not configured")
 
     if authorization is None or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+        raise HTTPException(
+            status_code=401, detail="Missing or invalid Authorization header"
+        )
 
     token = authorization[len("Bearer "):]
 
