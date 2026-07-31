@@ -12,4 +12,4 @@ __pycache__/
 
 # Data (לא מעלים דאמפים גדולים ל-git)
 *.csv
-!schema.sql
+!schema.sqlcatboost_info/
