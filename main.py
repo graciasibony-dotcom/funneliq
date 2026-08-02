@@ -2,6 +2,7 @@ import os
 import catboost as cb
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from supabase import Client, create_client
@@ -119,6 +120,11 @@ def get_user_supabase_client(authorization: str = Header(None)) -> Client:
     user_client.postgrest.auth(token)
 
     return user_client
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse(url="/docs")
+
 
 @app.get("/health")
 def health_check():
