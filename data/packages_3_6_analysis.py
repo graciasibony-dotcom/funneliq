@@ -44,14 +44,18 @@ models_clf = {
     'XGBoost': xgb.XGBClassifier(
         random_state=42, scale_pos_weight=(y_up == 0).sum() / (y_up == 1).sum()
     ),
-    'LightGBM': lgb.LGBMClassifier(random_state=42, verbose=-1, class_weight='balanced'),
+    'LightGBM': lgb.LGBMClassifier(
+        random_state=42, verbose=-1, class_weight='balanced'
+    ),
     'CatBoost': cb.CatBoostClassifier(
         random_state=42, verbose=0, auto_class_weights='Balanced'
     ),
 }
 
 skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-scoring = {'accuracy': 'accuracy', 'precision': 'precision', 'recall': 'recall', 'f1': 'f1'}
+scoring = {
+    'accuracy': 'accuracy', 'precision': 'precision', 'recall': 'recall', 'f1': 'f1'
+}
 
 results_upsell = {}
 for name, model in models_clf.items():
@@ -72,7 +76,9 @@ print("\nFeature importance (CatBoost):")
 print(importance_upsell)
 
 # חוק עסקי פשוט מול המודל
-rule_pred = ((df_up['customer_acquisition_cost'] < 1000) & (df_up['followup_1'] > 22)).astype(int)
+rule_pred = (
+    (df_up['customer_acquisition_cost'] < 1000) & (df_up['followup_1'] > 22)
+).astype(int)
 model_pred_cv = cross_val_predict(models_clf['CatBoost'], X_up, y_up, cv=skf)
 
 print("\n=== חוק עסקי מול מודל ===")
@@ -104,7 +110,9 @@ param_grid = {
     'depth': [4, 6, 8],
     'iterations': [200, 500],
 }
-base_model = cb.CatBoostClassifier(random_state=42, verbose=0, auto_class_weights='Balanced')
+base_model = cb.CatBoostClassifier(
+    random_state=42, verbose=0, auto_class_weights='Balanced'
+)
 grid = GridSearchCV(base_model, param_grid, scoring='f1', cv=skf, n_jobs=-1)
 grid.fit(X_ref, y_ref)
 print("\n=== חבילה 4: Hyperparameter tuning ===")
@@ -134,14 +142,19 @@ print("\n=== פרופיל סופר-לקוחות ===")
 print(f"מספר: {len(super_customers)} מתוך {len(df_ref)} "
       f"({len(super_customers)/len(df_ref)*100:.1f}%)")
 print(f"אחוז מהרווח הכולל: {super_profit/total_profit*100:.1f}%")
-print(f"CAC ממוצע — סופר-לקוחות: {super_customers['customer_acquisition_cost'].mean():.1f}")
+print(
+    f"CAC ממוצע — סופר-לקוחות: "
+    f"{super_customers['customer_acquisition_cost'].mean():.1f}"
+)
 print(f"CAC ממוצע — שאר: {regular_customers['customer_acquisition_cost'].mean():.1f}")
 
 
 # =========================================================================
 # חבילה 5 — פרדוקס המעקבים (dropout ניתוח תיאורי)
 # =========================================================================
-stages = ['num_leads', 'followup_1', 'followup_2', 'followup_3', 'followup_4', 'followup_5']
+stages = [
+    'num_leads', 'followup_1', 'followup_2', 'followup_3', 'followup_4', 'followup_5'
+]
 sums = df[stages].sum()
 
 print("\n=== חבילה 5: נשירה בכל שלב מעקב ===")
@@ -182,7 +195,7 @@ kf = KFold(n_splits=5, shuffle=True, random_state=42)
 rmse = -cross_val_score(profit_model, X_budget, y_profit, cv=kf,
                          scoring='neg_root_mean_squared_error')
 r2 = cross_val_score(profit_model, X_budget, y_profit, cv=kf, scoring='r2')
-print(f"\n=== חבילה 6: מודל cumulative_profit ~ ad_budget ===")
+print("\n=== חבילה 6: מודל cumulative_profit ~ ad_budget ===")
 print(f"RMSE: {rmse.mean():.1f}, R2: {r2.mean():.3f}")
 
 profit_model.fit(X_budget, y_profit)
