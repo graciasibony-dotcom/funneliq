@@ -1,0 +1,17 @@
+{
+  "stages": [
+    "num_leads->followup_1",
+    "followup_1->followup_2",
+    "followup_2->followup_3",
+    "followup_3->followup_4",
+    "followup_4->followup_5"
+  ],
+  "dropout_pct": [
+    52.6,
+    25.7,
+    18.6,
+    10.4,
+    29.2
+  ],
+  "recommendation": "השלב היעיל ביותר הוא followup_3->followup_4 (נשירה של 10.4%). השלב האחרון (followup_4->followup_5) מראה נשירה גבוהה יותר (29.2%) מהשלב שלפניו (followup_3->followup_4, 10.4%). מומלץ להמשיך את המעקב לפחות עד followup_4, ולבדוק לעומק בנפרד את followup_4->followup_5 (למשל A/B טסט על ניסוח או תזמון) לפני שמוותרים עליו."
+}
