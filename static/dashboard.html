@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FunnelIQ - Dashboard</title>
+<style>
+  :root {
+    --color-primary: #2563eb;
+    --color-primary-dark: #1d4ed8;
+    --color-success: #059669;
+    --color-success-bg: #ecfdf5;
+    --color-success-border: #a7f3d0;
+    --color-error: #dc2626;
+    --color-error-bg: #fef2f2;
+    --color-text: #0f172a;
+    --color-text-secondary: #64748b;
+    --color-border: #e2e8f0;
+    --color-bg: #f8fafc;
+    --color-card-bg: #ffffff;
+
+    --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    --space-1: 8px;
+    --space-2: 16px;
+    --space-3: 24px;
+    --space-4: 32px;
+
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-family);
+    color: var(--color-text);
+    background: var(--color-bg);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-3) var(--space-2) var(--space-4);
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-4);
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+  }
+
+  .card-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-2);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-3);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  .card.wide {
+    grid-column: 1 / -1;
+  }
+
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: flex-end;
+    margin-top: var(--space-2);
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.8rem;
+  }
+
+  .field label {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+  }
+
+  input {
+    padding: 8px 10px;
+    font-size: 0.95rem;
+    width: 112px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    color: var(--color-text);
+  }
+
+  input:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+    border-color: var(--color-primary);
+  }
+
+  button {
+    padding: 9px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    height: 38px;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+  }
+
+  button:hover {
+    background: var(--color-primary-dark);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--color-primary-dark);
+    outline-offset: 2px;
+  }
+
+  .result {
+    margin-top: var(--space-2);
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    min-height: 1.2em;
+  }
+
+  .result.error {
+    color: var(--color-error);
+  }
+
+  .result-headline {
+    display: none;
+    margin-top: var(--space-2);
+    padding: var(--space-2);
+    background: var(--color-success-bg);
+    border: 1px solid var(--color-success-border);
+    border-radius: var(--radius-sm);
+  }
+
+  .result-headline.visible {
+    display: block;
+  }
+
+  .result-headline .value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-success);
+    line-height: 1.2;
+  }
+
+  .result-headline .unit {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-right: 6px;
+  }
+
+  .result-headline .label {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+  }
+
+  .score-bar {
+    background: #eee;
+    border-radius: 999px;
+    height: 16px;
+    width: 100%;
+    max-width: 320px;
+    margin-top: var(--space-2);
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    background: var(--color-success);
+    height: 100%;
+    transition: width 0.3s ease;
+  }
+
+  table {
+    border-collapse: collapse;
+    margin-top: var(--space-2);
+    width: 100%;
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    border: 1px solid var(--color-border);
+    padding: 8px 10px;
+    text-align: right;
+  }
+
+  th {
+    background: var(--color-bg);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+  }
+
+  tr.best-row td {
+    background: var(--color-success-bg);
+    font-weight: 700;
+  }
+
+  #logout {
+    background: none;
+    color: var(--color-primary);
+    height: auto;
+    padding: 6px 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  #logout:hover {
+    background: var(--color-bg);
+  }
+
+  .rec {
+    margin-top: var(--space-2);
+    padding: var(--space-2);
+    background: var(--color-bg);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .dropout-chart {
+    width: 100%;
+    height: auto;
+    margin-top: var(--space-2);
+    font-family: inherit;
+  }
+
+  .dropout-chart .bar {
+    fill: var(--color-primary);
+  }
+
+  .dropout-chart .bar.worst {
+    fill: var(--color-error);
+  }
+
+  .dropout-chart .bar-label,
+  .dropout-chart .axis-label {
+    fill: var(--color-text-secondary);
+    font-size: 11px;
+  }
+
+  .dropout-chart .value-label {
+    fill: var(--color-text);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .dropout-chart .gridline {
+    stroke: var(--color-border);
+    stroke-width: 1;
+  }
+
+  @media (max-width: 480px) {
+    .cards {
+      grid-template-columns: 1fr;
+    }
+    form {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    input {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>FunnelIQ Dashboard</h1>
+  <button id="logout">התנתקות</button>
+</header>
+
+<div class="cards">
+
+  <section class="card" id="ltv-section">
+    <h2>תחזית LTV</h2>
+    <p class="card-subtitle">כמה זמן לקוח חדש צפוי להישאר</p>
+    <form id="ltv-form">
+      <div class="field"><label for="ltv-ad_budget">ad_budget</label><input id="ltv-ad_budget" type="number" name="ad_budget" value="1000" step="any" required></div>
+      <div class="field"><label for="ltv-num_leads">num_leads</label><input id="ltv-num_leads" type="number" name="num_leads" value="50" step="any" required></div>
+      <div class="field"><label for="ltv-leads_answered">leads_answered</label><input id="ltv-leads_answered" type="number" name="leads_answered" value="40" step="any" required></div>
+      <div class="field"><label for="ltv-leads_not_answered">leads_not_answered</label><input id="ltv-leads_not_answered" type="number" name="leads_not_answered" value="10" step="any" required></div>
+      <div class="field"><label for="ltv-followup_1">followup_1</label><input id="ltv-followup_1" type="number" name="followup_1" value="30" step="any" required></div>
+      <div class="field"><label for="ltv-followup_2">followup_2</label><input id="ltv-followup_2" type="number" name="followup_2" value="20" step="any" required></div>
+      <div class="field"><label for="ltv-followup_3">followup_3</label><input id="ltv-followup_3" type="number" name="followup_3" value="15" step="any" required></div>
+      <div class="field"><label for="ltv-followup_4">followup_4</label><input id="ltv-followup_4" type="number" name="followup_4" value="10" step="any" required></div>
+      <div class="field"><label for="ltv-followup_5">followup_5</label><input id="ltv-followup_5" type="number" name="followup_5" value="8" step="any" required></div>
+      <div class="field"><label for="ltv-cac">customer_acquisition_cost</label><input id="ltv-cac" type="number" name="customer_acquisition_cost" value="500" step="any" required></div>
+      <button type="submit">חשב תחזית</button>
+    </form>
+    <div id="ltv-result" class="result"></div>
+    <div id="ltv-headline" class="result-headline">
+      <span class="value" id="ltv-value"></span><span class="unit">חודשים</span>
+      <div class="label">אורך חיים צפוי של הלקוח</div>
+    </div>
+  </section>
+
+  <section class="card" id="upsell-section">
+    <h2>הסתברות ל-Upsell</h2>
+    <p class="card-subtitle">מה הסיכוי שהלקוח ירכוש שירות/מוצר נוסף</p>
+    <form id="upsell-form">
+      <div class="field"><label for="up-ad_budget">ad_budget</label><input id="up-ad_budget" type="number" name="ad_budget" value="1000" step="any" required></div>
+      <div class="field"><label for="up-num_leads">num_leads</label><input id="up-num_leads" type="number" name="num_leads" value="50" step="any" required></div>
+      <div class="field"><label for="up-leads_answered">leads_answered</label><input id="up-leads_answered" type="number" name="leads_answered" value="40" step="any" required></div>
+      <div class="field"><label for="up-leads_not_answered">leads_not_answered</label><input id="up-leads_not_answered" type="number" name="leads_not_answered" value="10" step="any" required></div>
+      <div class="field"><label for="up-followup_1">followup_1</label><input id="up-followup_1" type="number" name="followup_1" value="30" step="any" required></div>
+      <div class="field"><label for="up-followup_2">followup_2</label><input id="up-followup_2" type="number" name="followup_2" value="20" step="any" required></div>
+      <div class="field"><label for="up-followup_3">followup_3</label><input id="up-followup_3" type="number" name="followup_3" value="15" step="any" required></div>
+      <div class="field"><label for="up-followup_4">followup_4</label><input id="up-followup_4" type="number" name="followup_4" value="10" step="any" required></div>
+      <div class="field"><label for="up-followup_5">followup_5</label><input id="up-followup_5" type="number" name="followup_5" value="8" step="any" required></div>
+      <div class="field"><label for="up-calls_to_closed">calls_to_closed</label><input id="up-calls_to_closed" type="number" name="calls_to_closed" value="3" step="any" required></div>
+      <div class="field"><label for="up-calls_to_not_closed">calls_to_not_closed</label><input id="up-calls_to_not_closed" type="number" name="calls_to_not_closed" value="2" step="any" required></div>
+      <div class="field"><label for="up-cac">customer_acquisition_cost</label><input id="up-cac" type="number" name="customer_acquisition_cost" value="500" step="any" required></div>
+      <div class="field"><label for="up-closed">closed</label><input id="up-closed" type="number" name="closed" value="1" step="any" required></div>
+      <div class="field"><label for="up-not_closed">not_closed</label><input id="up-not_closed" type="number" name="not_closed" value="0" step="any" required></div>
+      <button type="submit">חשב תחזית</button>
+    </form>
+    <div id="upsell-result" class="result"></div>
+    <div id="upsell-headline" class="result-headline">
+      <span class="value" id="upsell-value"></span><span class="unit">הסתברות ל-upsell</span>
+      <div class="label" id="upsell-label"></div>
+    </div>
+  </section>
+
+  <section class="card" id="super-customer-section">
+    <h2>ציון Super-Customer</h2>
+    <p class="card-subtitle">האם הלקוח עשוי להיות לקוח-על — נאמן, ממליץ ורווחי</p>
+    <form id="super-customer-form">
+      <div class="field"><label for="sc-ad_budget">ad_budget</label><input id="sc-ad_budget" type="number" name="ad_budget" value="1000" step="any" required></div>
+      <div class="field"><label for="sc-num_leads">num_leads</label><input id="sc-num_leads" type="number" name="num_leads" value="50" step="any" required></div>
+      <div class="field"><label for="sc-leads_answered">leads_answered</label><input id="sc-leads_answered" type="number" name="leads_answered" value="40" step="any" required></div>
+      <div class="field"><label for="sc-leads_not_answered">leads_not_answered</label><input id="sc-leads_not_answered" type="number" name="leads_not_answered" value="10" step="any" required></div>
+      <div class="field"><label for="sc-followup_1">followup_1</label><input id="sc-followup_1" type="number" name="followup_1" value="30" step="any" required></div>
+      <div class="field"><label for="sc-followup_2">followup_2</label><input id="sc-followup_2" type="number" name="followup_2" value="20" step="any" required></div>
+      <div class="field"><label for="sc-followup_3">followup_3</label><input id="sc-followup_3" type="number" name="followup_3" value="15" step="any" required></div>
+      <div class="field"><label for="sc-followup_4">followup_4</label><input id="sc-followup_4" type="number" name="followup_4" value="10" step="any" required></div>
+      <div class="field"><label for="sc-followup_5">followup_5</label><input id="sc-followup_5" type="number" name="followup_5" value="8" step="any" required></div>
+      <div class="field"><label for="sc-cac">customer_acquisition_cost</label><input id="sc-cac" type="number" name="customer_acquisition_cost" value="500" step="any" required></div>
+      <button type="submit">חשב ציון</button>
+    </form>
+    <div id="super-customer-result" class="result"></div>
+    <div id="super-customer-headline" class="result-headline">
+      <span class="value" id="score-value"></span><span class="unit">/ 100</span>
+      <div class="score-bar"><div class="score-bar-fill" id="score-bar-fill"></div></div>
+    </div>
+  </section>
+
+  <section class="card" id="budget-section">
+    <h2>סימולטור תקציב</h2>
+    <p class="card-subtitle">איך לחלק תקציב פרסום חודשי בין קמפיינים כדי למקסם רווח</p>
+    <form id="budget-form">
+      <div class="field"><label for="total_budget">תקציב חודשי כולל (₪)</label><input id="total_budget" type="number" name="total_budget" value="50000" step="any" required></div>
+      <button type="submit">הרץ סימולציה</button>
+    </form>
+    <div id="budget-result" class="result"></div>
+    <table id="budget-table" style="display:none">
+      <thead>
+        <tr><th>אסטרטגיה</th><th>תקציב לקמפיין</th><th>רווח כולל צפוי</th></tr>
+      </thead>
+      <tbody id="budget-table-body"></tbody>
+    </table>
+  </section>
+
+  <section class="card wide" id="dropout-panel">
+    <h2>תובנות נשירת מעקבים</h2>
+    <p class="card-subtitle">איפה לידים נושרים לאורך שלבי המעקב</p>
+    <div id="dropout-content">טוען...</div>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://twescwdxlcnrwitanpfv.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3ZXNjd2R4bGNucndpdGFucGZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyMzk2NjAsImV4cCI6MjEwMDgxNTY2MH0.0a9VFTw9CWUZ2SoWRTneZCFlb-iL9zibA2Kl1fmkwBg";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const token = localStorage.getItem("funneliq_token");
+  if (!token) {
+    window.location.href = "login.html";
+  }
+
+  function authHeaders() {
+    return {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token,
+    };
+  }
+
+  async function handleAuthFailure(response) {
+    if (response.status === 401) {
+      localStorage.removeItem("funneliq_token");
+      window.location.href = "login.html";
+      return true;
+    }
+    return false;
+  }
+
+  function formToPayload(form) {
+    const payload = {};
+    for (const el of form.elements) {
+      if (el.name) payload[el.name] = parseFloat(el.value);
+    }
+    return payload;
+  }
+
+  function bindPredictForm(formId, resultId, endpoint, onResult) {
+    const form = document.getElementById(formId);
+    const resultEl = document.getElementById(resultId);
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      resultEl.textContent = "מחשב...";
+      resultEl.className = "result";
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify(formToPayload(form)),
+        });
+
+        if (await handleAuthFailure(response)) return;
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          resultEl.textContent = data.detail || "שגיאה בבקשה";
+          resultEl.className = "result error";
+          return;
+        }
+
+        resultEl.textContent = "";
+        onResult(data);
+      } catch (err) {
+        resultEl.textContent = "שגיאת רשת: " + err.message;
+        resultEl.className = "result error";
+      }
+    });
+  }
+
+  bindPredictForm("ltv-form", "ltv-result", "/predict/ltv", (data) => {
+    document.getElementById("ltv-headline").classList.add("visible");
+    document.getElementById("ltv-value").textContent = data.ltv_months.toFixed(1);
+  });
+
+  bindPredictForm("upsell-form", "upsell-result", "/predict/upsell", (data) => {
+    const pct = (data.upsell_probability * 100).toFixed(1);
+    const label = data.upsell_prediction === 1 ? "צפוי upsell" : "לא צפוי upsell";
+    document.getElementById("upsell-headline").classList.add("visible");
+    document.getElementById("upsell-value").textContent = pct + "%";
+    document.getElementById("upsell-label").textContent = label;
+  });
+
+  bindPredictForm("super-customer-form", "super-customer-result", "/predict/super-customer", (data) => {
+    document.getElementById("super-customer-headline").classList.add("visible");
+    document.getElementById("score-value").textContent = data.super_customer_score;
+    document.getElementById("score-bar-fill").style.width = data.super_customer_score + "%";
+  });
+
+  const BUDGET_STRATEGIES = [5, 10, 25, 50];
+
+  const budgetForm = document.getElementById("budget-form");
+  const budgetResultEl = document.getElementById("budget-result");
+  const budgetTable = document.getElementById("budget-table");
+  const budgetTableBody = document.getElementById("budget-table-body");
+
+  budgetForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const totalBudget = parseFloat(budgetForm.elements["total_budget"].value);
+
+    budgetResultEl.textContent = "מריץ סימולציה...";
+    budgetResultEl.className = "result";
+    budgetTable.style.display = "none";
+    budgetTableBody.innerHTML = "";
+
+    try {
+      const rows = [];
+      for (const count of BUDGET_STRATEGIES) {
+        const perCampaign = totalBudget / count;
+        const response = await fetch("/predict/budget-profit", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({ ad_budget: perCampaign }),
+        });
+
+        if (await handleAuthFailure(response)) return;
+
+        const data = await response.json();
+        if (!response.ok) {
+          budgetResultEl.textContent = data.detail || "שגיאה בבקשה";
+          budgetResultEl.className = "result error";
+          return;
+        }
+
+        rows.push({
+          count,
+          perCampaign,
+          totalProfit: data.predicted_profit * count,
+        });
+      }
+
+      budgetResultEl.textContent = "";
+      const maxProfit = Math.max(...rows.map((r) => r.totalProfit));
+      for (const row of rows) {
+        const tr = document.createElement("tr");
+        if (row.totalProfit === maxProfit) tr.className = "best-row";
+        tr.innerHTML = `
+          <td>${row.count} קמפיינים</td>
+          <td>₪${row.perCampaign.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+          <td>₪${row.totalProfit.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+        `;
+        budgetTableBody.appendChild(tr);
+      }
+      budgetTable.style.display = "table";
+    } catch (err) {
+      budgetResultEl.textContent = "שגיאת רשת: " + err.message;
+      budgetResultEl.className = "result error";
+    }
+  });
+
+  function renderDropoutChart(stages, dropoutPct) {
+    const width = 600;
+    const height = 220;
+    const paddingLeft = 36;
+    const paddingBottom = 46;
+    const paddingTop = 16;
+    const chartWidth = width - paddingLeft - 10;
+    const chartHeight = height - paddingTop - paddingBottom;
+    const maxVal = Math.max(...dropoutPct) * 1.15;
+    const barWidth = chartWidth / stages.length - 16;
+    const worstIndex = dropoutPct.indexOf(Math.max(...dropoutPct));
+
+    const gridlines = [0, 25, 50].filter((g) => g <= maxVal).map((g) => {
+      const y = paddingTop + chartHeight - (g / maxVal) * chartHeight;
+      return `
+        <line class="gridline" x1="${paddingLeft}" y1="${y}" x2="${width - 10}" y2="${y}" />
+        <text class="axis-label" x="${paddingLeft - 6}" y="${y + 4}" text-anchor="end">${g}%</text>
+      `;
+    }).join("");
+
+    const bars = stages.map((stage, i) => {
+      const barHeight = (dropoutPct[i] / maxVal) * chartHeight;
+      const x = paddingLeft + i * (chartWidth / stages.length) + 8;
+      const y = paddingTop + chartHeight - barHeight;
+      const labelShort = stage.replace("->", " → ");
+      return `
+        <rect class="bar ${i === worstIndex ? "worst" : ""}" x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="3" />
+        <text class="value-label" x="${x + barWidth / 2}" y="${y - 6}" text-anchor="middle">${dropoutPct[i]}%</text>
+        <text class="axis-label" x="${x + barWidth / 2}" y="${height - paddingBottom + 16}" text-anchor="middle">${labelShort}</text>
+      `;
+    }).join("");
+
+    return `
+      <svg class="dropout-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="גרף נשירת מעקבים בין השלבים">
+        ${gridlines}
+        ${bars}
+      </svg>
+    `;
+  }
+
+  async function loadDropoutInsights() {
+    const contentEl = document.getElementById("dropout-content");
+    try {
+      const response = await fetch("/insights/followup-dropout", {
+        headers: authHeaders(),
+      });
+
+      if (await handleAuthFailure(response)) return;
+
+      if (response.status === 503) {
+        contentEl.textContent = "קובץ התובנות אינו זמין כרגע.";
+        return;
+      }
+
+      const data = await response.json();
+      if (!response.ok) {
+        contentEl.textContent = data.detail || "שגיאה בטעינת התובנות";
+        return;
+      }
+
+      contentEl.innerHTML =
+        renderDropoutChart(data.stages, data.dropout_pct) +
+        `<div class="rec">${data.recommendation}</div>`;
+    } catch (err) {
+      contentEl.textContent = "שגיאת רשת: " + err.message;
+    }
+  }
+
+  loadDropoutInsights();
+
+  document.getElementById("logout").addEventListener("click", async () => {
+    await supabaseClient.auth.signOut();
+    localStorage.removeItem("funneliq_token");
+    window.location.href = "login.html";
+  });
+</script>
+
+</body>
+</html>

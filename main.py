@@ -1,3 +1,4 @@
+import json
 import os
 import catboost as cb
 from dotenv import load_dotenv
@@ -176,3 +177,12 @@ def predict_budget_profit(
     row = [[features.ad_budget]]
     prediction = model.predict(row)[0]
     return {"predicted_profit": float(prediction)}
+
+
+@app.get("/insights/followup-dropout")
+def followup_dropout_insights(current_user = Depends(get_current_user)):
+    path = os.path.join(MODELS_DIR, "followup_dropout_insights.json")
+    if not os.path.exists(path):
+        raise HTTPException(status_code=503, detail="Insights file is not available")
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
